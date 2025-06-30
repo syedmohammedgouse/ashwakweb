@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashwak Photography - Admin Panel</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-lock"></i>
+                <h2>Admin Login</h2>
+            </div>
+            <form id="loginForm">
+                <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="off" required />
+                <button type="submit" class="login-btn">Login</button>
+                <div class="login-error" id="loginError"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-container" id="adminContainer" style="display:none;">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-content">
+                <h1><i class="fas fa-camera"></i> Ashwak Photography Admin</h1>
+                <nav class="admin-nav">
+                    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> View Site</a>
+                    <a href="#" class="nav-link active"><i class="fas fa-upload"></i> Upload Images</a>
+                    <a href="#" class="nav-link"><i class="fas fa-images"></i> Manage Images</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <section class="admin-stats">
+            <div class="stat-card">
+                <i class="fas fa-images"></i>
+                <div class="stat-info">
+                    <span class="stat-label">Total Images</span>
+                    <span class="stat-value" id="statTotalImages">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-database"></i>
+                <div class="stat-info">
+                    <span class="stat-label">Total Storage</span>
+                    <span class="stat-value" id="statTotalSize">0 MB</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cloud-upload-alt"></i> Upload Images</h2>
+                    <p>Upload images to your photography portfolio. Select a category and drag & drop or click to upload.</p>
+                </div>
+
+                <!-- Upload Form -->
+                <div class="upload-form">
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" required>
+                            <option value="">Select a category</option>
+                            <option value="birthday">Birthday</option>
+                            <option value="maternity">Maternity</option>
+                            <option value="pre-wedding">Pre-Wedding</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="post-wedding">Post-Wedding</option>
+                            <option value="baby-shoots">Baby Shoots</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageTitle">Image Title (Optional):</label>
+                        <input type="text" id="imageTitle" name="imageTitle" placeholder="Enter image title...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageDescription">Description (Optional):</label>
+                        <textarea id="imageDescription" name="imageDescription" rows="3" placeholder="Enter image description..."></textarea>
+                    </div>
+
+                    <!-- Drag & Drop Zone -->
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-content">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag & Drop Images Here</h3>
+                            <p>or</p>
+                            <button type="button" class="upload-btn" id="uploadBtn">
+                                <i class="fas fa-folder-open"></i>
+                                Choose Files
+                            </button>
+                            <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                            <p class="upload-info">Supported formats: JPG, PNG, GIF, WebP (Max 10MB per file)</p>
+                        </div>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <div class="progress-header">
+                            <h4>Uploading Images...</h4>
+                            <span class="progress-text" id="progressText">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="upload-status" id="uploadStatus"></div>
+                    </div>
+
+                    <!-- Uploaded Files Preview -->
+                    <div class="uploaded-files" id="uploadedFiles" style="display: none;">
+                        <h4>Selected Files:</h4>
+                        <div class="files-grid" id="filesGrid"></div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="button" class="submit-btn" id="submitUpload" disabled>
+                            <i class="fas fa-upload"></i>
+                            Upload Images
+                        </button>
+                        <button type="button" class="clear-btn" id="clearUpload">
+                            <i class="fas fa-trash"></i>
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Management Section -->
+            <section class="management-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-images"></i> Manage Images</h2>
+                    <p>View and manage your uploaded images by category.</p>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="category-filter">
+                    <button class="category-btn active" data-category="all">
+                        <i class="fas fa-th"></i>
+                        All Images
+                    </button>
+                    <button class="category-btn" data-category="wedding">
+                        <i class="fas fa-heart"></i>
+                        Wedding
+                    </button>
+                    <button class="category-btn" data-category="portrait">
+                        <i class="fas fa-user"></i>
+                        Portrait
+                    </button>
+                    <button class="category-btn" data-category="event">
+                        <i class="fas fa-calendar"></i>
+                        Event
+                    </button>
+                    <button class="category-btn" data-category="commercial">
+                        <i class="fas fa-briefcase"></i>
+                        Commercial
+                    </button>
+                    <button class="category-btn" data-category="lifestyle">
+                        <i class="fas fa-coffee"></i>
+                        Lifestyle
+                    </button>
+                </div>
+
+                <!-- Images Grid -->
+                <div class="images-grid" id="imagesGrid">
+                    <!-- Images will be loaded here -->
+                </div>
+
+                <!-- Loading State -->
+                <div class="loading-state" id="loadingState">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading images...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <i class="fas fa-images"></i>
+                    <h3>No Images Found</h3>
+                    <p>Upload some images to get started!</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Image Details</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="image-preview">
+                    <img id="modalImage" src="" alt="">
+                </div>
+                <div class="image-info">
+                    <div class="info-item">
+                        <label>Filename:</label>
+                        <span id="modalFilename"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>Category:</label>
+                        <span id="modalCategory"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>Size:</label>
+                        <span id="modalSize"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>Upload Date:</label>
+                        <span id="modalDate"></span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="delete-btn" id="deleteImage">
+                        <i class="fas fa-trash"></i>
+                        Delete Image
+                    </button>
+                    <button class="cancel-btn" id="cancelDelete">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="message-container" id="messageContainer"></div>
+
+    <script src="admin.js"></script>
+</body>
+</html> 

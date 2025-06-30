@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Test - Ashwak Photography</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .upload-form input, .upload-form select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .upload-form button {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .upload-form button:hover {
+            background: #5a6fd8;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .images-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .image-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Test - Ashwak Photography</h1>
+    
+    <div class="test-section">
+        <h2>Test Upload</h2>
+        <form class="upload-form" id="uploadForm">
+            <select name="category" required>
+                <option value="">Select Category</option>
+                <option value="birthday">Birthday</option>
+                <option value="maternity">Maternity</option>
+                <option value="pre-wedding">Pre-Wedding</option>
+                <option value="wedding">Wedding</option>
+                <option value="post-wedding">Post-Wedding</option>
+                <option value="baby-shoots">Baby Shoots</option>
+            </select>
+            <input type="text" name="title" placeholder="Image Title" required>
+            <textarea name="description" placeholder="Image Description" rows="3"></textarea>
+            <input type="file" name="images" multiple accept="image/*" required>
+            <button type="submit">Upload Images</button>
+        </form>
+        <div id="uploadResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Current Images</h2>
+        <button onclick="loadImages()">Refresh Images</button>
+        <div id="imagesList" class="images-list"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        // Test upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const resultDiv = document.getElementById('uploadResult');
+            
+            try {
+                resultDiv.innerHTML = '<div class="result">Uploading...</div>';
+                
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result success">${result.message}</div>`;
+                    loadImages(); // Refresh images list
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        });
+        
+        // Load images
+        async function loadImages() {
+            const imagesList = document.getElementById('imagesList');
+            
+            try {
+                const response = await fetch(`${API_BASE}/images`);
+                const data = await response.json();
+                
+                imagesList.innerHTML = '';
+                
+                data.images.forEach(image => {
+                    const item = document.createElement('div');
+                    item.className = 'image-item';
+                    item.innerHTML = `
+                        <img src="${image.url}" alt="${image.title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzMzMzIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2UgTm90IEZvdW5kPC90ZXh0Pgo8L3N2Zz4K'">
+                        <h4>${image.title}</h4>
+                        <p><strong>Category:</strong> ${image.category}</p>
+                        <p><strong>Size:</strong> ${(image.size / 1024 / 1024).toFixed(2)} MB</p>
+                    `;
+                    imagesList.appendChild(item);
+                });
+            } catch (error) {
+                imagesList.innerHTML = `<div class="result error">Error loading images: ${error.message}</div>`;
+            }
+        }
+        
+        // Load images on page load
+        loadImages();
+    </script>
+</body>
+</html> 
